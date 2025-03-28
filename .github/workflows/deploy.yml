@@ -32,8 +32,9 @@ jobs:
       - name: Build
         run: pnpm run docs:build
       - uses: actions/configure-pages@v2
-      - uses: actions/upload-pages-artifact@v1
+      - uses: actions/upload-artifact@v2  # 手动指定使用 v2 版本
         with:
+          name: my-artifact
           path: docs/.vitepress/dist
       - name: Deploy
         id: deployment

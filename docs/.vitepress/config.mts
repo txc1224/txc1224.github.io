@@ -5,7 +5,6 @@ import { sidebar } from "../../config/docSidebarConf";
 export default defineConfig({
   title: "备忘录",
   description: "txc的备忘录",
-  base: "/txc/",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [

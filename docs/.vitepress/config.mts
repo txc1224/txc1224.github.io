@@ -1,28 +1,31 @@
-import { defineConfig } from 'vitepress'
+import { defineConfig } from "vitepress";
+import { sidebar } from "../../config/docSidebarConf";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "txc",
-  description: "A VitePress Site",
+  title: "备忘录",
+  description: "txc的备忘录",
+  base: "/txc/",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' }
+      { text: "首页", link: "/" },
+      // { text: "js", link: "/js" },
+      // {
+      //   text: "node",
+      //   link: "/node",
+      // },
     ],
-
-    sidebar: [
-      {
-        text: 'Examples',
-        items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
-        ]
-      }
-    ],
-
+    search: {
+      provider: "local",
+    },
+    sidebar,
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/txc1224' }
-    ]
-  }
-})
+      { icon: "github", link: "https://github.com/txc1224" },
+      {
+        icon: "juejin",
+        link: "https://juejin.cn/user/2502908797789399",
+      },
+    ],
+  },
+});

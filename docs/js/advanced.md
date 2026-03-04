@@ -1,3 +1,8 @@
+---
+title: 'Map & Set / Generator / Proxy / Symbol'
+order: 6
+---
+
 # Map & Set / Generator / Proxy / Symbol
 
 ## Map / Set / WeakMap / WeakSet

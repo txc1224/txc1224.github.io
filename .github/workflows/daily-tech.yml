@@ -1,0 +1,40 @@
+name: 每日科技资讯聚合
+
+on:
+  schedule:
+    # 每天 UTC 10:00（北京时间 18:00）
+    - cron: "0 10 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-daily-tech:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch and generate daily tech news
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: python scripts/fetch_daily_tech.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/daily-tech/
+          git diff --cached --quiet || git commit -m "chore: 每日科技资讯更新 $(date -u +%Y-%m-%d)"
+          git push

@@ -11,17 +11,24 @@ interface ISidebarConf {
 export const sidebar: ISidebarConf = {
   "/js/": [
     {
-      text: "js",
-      link: "/js",
+      text: "JS",
+      link: "/js/",
     },
   ],
   "/node/": [
     {
-      text: "node",
+      text: "Node.js",
+      link: "/node/",
     },
     {
-      text: "fs",
+      text: "fs 文件系统",
       link: "/node/fs",
+    },
+  ],
+  "/daily-tech/": [
+    {
+      text: "每日科技资讯",
+      link: "/daily-tech/",
     },
   ],
 };

@@ -9,6 +9,5 @@ title: '每日科技资讯'
 ## 最新文章
 
 <!-- DAILY_TECH_INDEX_START -->
-
 - [2026-03-04](/daily-tech/2026-03-04)
 <!-- DAILY_TECH_INDEX_END -->

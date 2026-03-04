@@ -5,5 +5,5 @@
 ## 最新文章
 
 <!-- DAILY_TECH_INDEX_START -->
-*暂无数据，等待 GitHub Actions 首次运行后自动填充。*
+- [2026-03-04](/daily-tech/2026-03-04)
 <!-- DAILY_TECH_INDEX_END -->

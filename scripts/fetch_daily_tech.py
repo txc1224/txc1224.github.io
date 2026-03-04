@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 每日科技资讯聚合脚本
-数据来源：HackerNews Algolia API + GitHub Trending
+数据来源：HackerNews Algolia API + GitHub Trending + 多个 RSS 源
 AI 翻译：Groq API（llama-3.1-8b-instant）
 """
 
@@ -10,6 +10,7 @@ import json
 import datetime
 import re
 import requests
+import feedparser
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
@@ -27,6 +28,74 @@ HN_QUERIES = {
 }
 HN_PER_SECTION = 5
 GITHUB_TRENDING_N = 8
+
+# RSS 信息源配置
+RSS_SOURCES = [
+    {
+        "name": "arXiv AI 研究",
+        "url": "https://export.arxiv.org/rss/cs.AI",
+        "limit": 5,
+        "translate": True,
+        "section_group": "ai_research",
+    },
+    {
+        "name": "arXiv 分布式系统",
+        "url": "https://export.arxiv.org/rss/cs.DC",
+        "limit": 5,
+        "translate": True,
+        "section_group": "ai_research",
+    },
+    {
+        "name": "Dev.to",
+        "url": "https://dev.to/feed",
+        "limit": 5,
+        "translate": True,
+        "section_group": "dev_community",
+    },
+    {
+        "name": "Lobste.rs",
+        "url": "https://lobste.rs/rss",
+        "limit": 5,
+        "translate": True,
+        "section_group": "dev_community",
+    },
+    {
+        "name": "MIT Technology Review",
+        "url": "https://www.technologyreview.com/feed/",
+        "limit": 5,
+        "translate": True,
+        "section_group": "tech_news",
+    },
+    {
+        "name": "Ars Technica",
+        "url": "https://feeds.arstechnica.com/arstechnica/technology-lab",
+        "limit": 5,
+        "translate": True,
+        "section_group": "tech_news",
+    },
+    {
+        "name": "Reddit r/MachineLearning",
+        "url": "https://www.reddit.com/r/MachineLearning/.rss",
+        "limit": 5,
+        "translate": True,
+        "section_group": "reddit",
+    },
+    {
+        "name": "Reddit r/programming",
+        "url": "https://www.reddit.com/r/programming/.rss",
+        "limit": 5,
+        "translate": True,
+        "section_group": "reddit",
+    },
+]
+
+# section_group 到 MD 标题的映射
+RSS_GROUP_TITLES = {
+    "ai_research": "AI 研究动态（arXiv）",
+    "dev_community": "开发者社区（Dev.to & Lobste.rs）",
+    "tech_news": "科技深度（MIT TR & Ars Technica）",
+    "reddit": "社区热议（Reddit）",
+}
 
 
 def fetch_hn_stories(query: str, n: int = 5) -> list[dict]:
@@ -77,6 +146,37 @@ def fetch_github_trending(n: int = 8) -> list[dict]:
         ]
     except Exception as e:
         print(f"[WARN] GitHub Trending fetch failed: {e}")
+        return []
+
+
+def fetch_rss(url: str, n: int = 5, timeout: int = 15) -> list[dict]:
+    """通用 RSS 抓取函数，返回统一格式条目列表"""
+    headers = {
+        "User-Agent": "Mozilla/5.0 (compatible; DailyTechBot/1.0; +https://github.com/txc1224/txc1224.github.io)"
+    }
+    try:
+        resp = requests.get(url, headers=headers, timeout=timeout)
+        resp.raise_for_status()
+        feed = feedparser.parse(resp.content)
+        items = []
+        for entry in feed.entries[:n]:
+            title = entry.get("title", "").strip()
+            link = entry.get("link", "").strip()
+            if not title or not link:
+                continue
+            # 提取摘要，优先 summary，其次 content
+            raw_summary = entry.get("summary", "") or ""
+            if not raw_summary and entry.get("content"):
+                raw_summary = entry["content"][0].get("value", "")
+            # 去除 HTML 标签
+            clean_summary = re.sub(r"<[^>]+>", "", raw_summary).strip()
+            # 截断过长摘要
+            if len(clean_summary) > 200:
+                clean_summary = clean_summary[:200] + "..."
+            items.append({"title": title, "url": link, "summary": clean_summary})
+        return items
+    except Exception as e:
+        print(f"[WARN] RSS fetch failed for {url}: {e}")
         return []
 
 
@@ -156,7 +256,7 @@ def format_stars(stars) -> str:
         return str(stars)
 
 
-def generate_daily_md(date_str: str, hn_sections: dict, trending: list) -> str:
+def generate_daily_md(date_str: str, hn_sections: dict, trending: list, rss_groups: dict) -> str:
     """生成每日资讯 MD 文件内容"""
     lines = [f"# 每日科技资讯 {date_str}", ""]
 
@@ -191,6 +291,26 @@ def generate_daily_md(date_str: str, hn_sections: dict, trending: list) -> str:
             stars = format_stars(repo.get("stars", 0))
             lang = repo.get("language") or "-"
             lines.append(f"| [{author}/{name}]({url}) | {lang} | {desc} | ⭐{stars} |")
+        lines.append("")
+
+    # 按 group 顺序输出 RSS 区块
+    for group_key, group_title in RSS_GROUP_TITLES.items():
+        group_items = rss_groups.get(group_key, [])
+        if not group_items:
+            continue
+        lines.append(f"## {group_title}")
+        lines.append("")
+        lines.append("| 文章 | 来源 | 摘要 |")
+        lines.append("|------|------|------|")
+        for item in group_items:
+            title_zh = item.get("title_zh", item["title"])
+            summary_zh = item.get("summary_zh", item.get("summary", "-") or "-")
+            # 截断摘要避免表格撑开
+            if len(summary_zh) > 60:
+                summary_zh = summary_zh[:60] + "..."
+            url = item["url"]
+            source = item.get("source_name", "")
+            lines.append(f"| [{title_zh}]({url}) | {source} | {summary_zh} |")
         lines.append("")
 
     return "\n".join(lines)
@@ -271,9 +391,40 @@ def main():
         if desc:
             repo["desc_zh"] = groq_translate_description(desc)
 
+    # 抓取所有 RSS 源，并按 group 分组
+    rss_groups: dict[str, list] = {}
+    for source in RSS_SOURCES:
+        name = source["name"]
+        url = source["url"]
+        limit = source["limit"]
+        group = source["section_group"]
+        print(f"[INFO] 抓取 RSS [{name}]...")
+        items = fetch_rss(url, limit)
+        for item in items:
+            item["source_name"] = name
+        if group not in rss_groups:
+            rss_groups[group] = []
+        rss_groups[group].extend(items)
+
+    # 批量翻译所有 RSS 条目标题
+    all_rss_titles = []
+    rss_item_refs = []  # 指向原始 item 的引用列表
+    for group_items in rss_groups.values():
+        for item in group_items:
+            all_rss_titles.append(item["title"])
+            rss_item_refs.append(item)
+
+    if all_rss_titles:
+        print(f"[INFO] 翻译 {len(all_rss_titles)} 条 RSS 标题...")
+        translated_rss = groq_translate(all_rss_titles)
+        for item, translated in zip(rss_item_refs, translated_rss):
+            parts = translated.split("|", 1)
+            item["title_zh"] = parts[0].strip() if parts else item["title"]
+            item["summary_zh"] = parts[1].strip() if len(parts) > 1 else item.get("summary", "-") or "-"
+
     # 生成 MD 文件
     os.makedirs(DOCS_DIR, exist_ok=True)
-    md_content = generate_daily_md(date_str, hn_sections, trending)
+    md_content = generate_daily_md(date_str, hn_sections, trending, rss_groups)
     with open(filepath, "w", encoding="utf-8") as f:
         f.write(md_content)
     print(f"[INFO] 已生成 {filepath}")

@@ -1,5 +1,6 @@
 ---
 title: '概览'
+description: 'Java 面向对象、集合框架、多线程、JVM 与常用设计模式备忘'
 order: 1
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: '概览'
+description: 'Vue 3 响应式、组件化、Composition API、Router 与 Pinia 核心知识备忘'
 order: 1
 ---
 

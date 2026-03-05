@@ -10,6 +10,15 @@ export default withMermaid(
     description: 'txc的备忘录',
     appearance: 'dark',
     lastUpdated: true,
+    head: [
+      ['meta', { property: 'og:type', content: 'website' }],
+      ['meta', { property: 'og:title', content: 'txc 技术备忘录' }],
+      ['meta', { property: 'og:description', content: '记录开发中遇到的知识点、踩坑与最佳实践' }],
+      ['meta', { property: 'og:url', content: 'https://txc1224.github.io' }],
+    ],
+    sitemap: {
+      hostname: 'https://txc1224.github.io',
+    },
     vite: {
       plugins: [
         pagefindPlugin({

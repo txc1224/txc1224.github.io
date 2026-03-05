@@ -1,5 +1,6 @@
 ---
 title: '每日科技资讯'
+description: '每天自动聚合 HackerNews 热门文章与 GitHub Trending 项目，Groq AI 翻译摘要'
 ---
 
 # 每日科技资讯

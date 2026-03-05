@@ -1,5 +1,6 @@
 ---
 title: '概览'
+description: 'JavaScript 闭包、原型链、异步编程、ES6+ 新特性等核心知识点备忘'
 order: 1
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: '概览'
+description: 'Python 数据类型、函数式编程、装饰器、异步与常用库实用备忘'
 order: 1
 ---
 

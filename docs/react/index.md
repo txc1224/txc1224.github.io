@@ -1,5 +1,6 @@
 ---
 title: '概览'
+description: 'React 18+ JSX、Hooks、状态管理、Router、Next.js 与生态工具链备忘'
 order: 1
 ---
 

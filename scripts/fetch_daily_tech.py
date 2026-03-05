@@ -526,7 +526,14 @@ def generate_daily_md(
     weibo_items = weibo_items or []
     ddg_items = ddg_items or []
 
-    lines = [f"# 每日科技资讯 {date_str}", ""]
+    lines = [
+        "---",
+        f"title: '每日科技资讯 {date_str}'",
+        "---",
+        "",
+        f"# 每日科技资讯 {date_str}",
+        "",
+    ]
 
     for section_name, items in hn_sections.items():
         if not items:

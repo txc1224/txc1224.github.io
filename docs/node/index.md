@@ -1,5 +1,6 @@
 ---
 title: '概览 & Event Loop'
+description: 'Node.js 文件系统、HTTP 模块、流处理、Event Loop 等服务端开发要点备忘'
 order: 1
 ---
 

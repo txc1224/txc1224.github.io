@@ -7,6 +7,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 
 const canvasRef = ref<HTMLCanvasElement>();
 let animationId = 0;
+let resizeTimer = 0;
 
 interface Petal {
   x: number;
@@ -60,8 +61,12 @@ onMounted(() => {
     canvas!.width = window.innerWidth;
     canvas!.height = window.innerHeight;
   }
+  function debouncedResize() {
+    clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(resize, 150);
+  }
   resize();
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize', debouncedResize);
 
   const petals: Petal[] = Array.from({ length: petalCount }, () => createPetal(canvas!.width, canvas!.height));
   // 初始化时让花瓣散布在整个屏幕
@@ -96,7 +101,8 @@ onMounted(() => {
 
   onUnmounted(() => {
     cancelAnimationFrame(animationId);
-    window.removeEventListener('resize', resize);
+    clearTimeout(resizeTimer);
+    window.removeEventListener('resize', debouncedResize);
   });
 });
 </script>

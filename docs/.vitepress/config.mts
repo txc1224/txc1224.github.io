@@ -1,10 +1,16 @@
+import { createRequire } from 'node:module';
 import { defineConfig } from 'vitepress';
 import { withMermaid } from 'vitepress-plugin-mermaid';
 import { generateSidebar } from 'vitepress-sidebar';
 import { pagefindPlugin } from 'vitepress-plugin-pagefind';
 
 // https://vitepress.dev/reference/site-config
-export default withMermaid(
+const require = createRequire(import.meta.url);
+const dayjsEsmEntry = require.resolve('dayjs/esm/index.js');
+const sanitizeUrlShim = require.resolve('./theme/utils/sanitize-url-shim.mjs');
+const sanitizeUrlEntry = require.resolve('@braintree/sanitize-url/dist/index.js');
+
+const config = withMermaid(
   defineConfig({
     title: '备忘录',
     description: 'txc的备忘录',
@@ -20,6 +26,16 @@ export default withMermaid(
       hostname: 'https://txc1224.github.io',
     },
     vite: {
+      resolve: {
+        alias: [
+          { find: /^dayjs$/, replacement: dayjsEsmEntry },
+          { find: /^@braintree\/sanitize-url$/, replacement: sanitizeUrlShim },
+          {
+            find: /^@braintree\/sanitize-url\/dist\/index\.js$/,
+            replacement: sanitizeUrlEntry,
+          },
+        ],
+      },
       plugins: [
         pagefindPlugin({
           btnPlaceholder: '搜索文档',
@@ -143,3 +159,13 @@ export default withMermaid(
     },
   }),
 );
+
+const blockedOptimizeDeps = new Set(['@braintree/sanitize-url', 'debug', 'cytoscape-cose-bilkent', 'cytoscape']);
+
+config.vite ??= {};
+config.vite.optimizeDeps ??= {};
+config.vite.optimizeDeps.include = (config.vite.optimizeDeps.include ?? []).filter(
+  (item) => !blockedOptimizeDeps.has(item),
+);
+
+export default config;

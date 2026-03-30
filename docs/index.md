@@ -36,6 +36,10 @@ features:
     title: Git
     details: 日常操作、分支策略、远程协作、撤销与高级技巧
     link: /git/
+  - icon: 🎮
+    title: 小游戏
+    details: 一个直接内嵌在文档站里的休闲小游戏，支持键盘和触屏操作
+    link: /playground/
   - icon: 📡
     title: 每日科技资讯
     details: 每天自动聚合 HackerNews 热门文章与 GitHub Trending 项目，Groq AI 翻译摘要

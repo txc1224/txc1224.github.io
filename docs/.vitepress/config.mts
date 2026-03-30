@@ -53,6 +53,7 @@ export default withMermaid(
           text: '工具',
           items: [{ text: 'Git', link: '/git/' }],
         },
+        { text: '小游戏', link: '/playground/' },
         { text: '每日科技资讯', link: '/daily-tech/' },
         { text: '收藏导航', link: '/bookmarks/' },
       ],
@@ -105,6 +106,12 @@ export default withMermaid(
           resolvePath: '/react/',
           useTitleFromFrontmatter: true,
           sortMenusByFrontmatterOrder: true,
+        },
+        {
+          documentRootPath: '/docs',
+          scanStartPath: 'playground',
+          resolvePath: '/playground/',
+          useTitleFromFrontmatter: true,
         },
         {
           documentRootPath: '/docs',

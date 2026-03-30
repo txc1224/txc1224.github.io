@@ -3,6 +3,10 @@ import type { Theme } from 'vitepress';
 import DefaultTheme from 'vitepress/theme';
 import SakuraCanvas from './components/SakuraCanvas.vue';
 import GiscusComment from './components/GiscusComment.vue';
+import MeteorHop from './components/MeteorHop.vue';
+import ArcadeHub from './components/ArcadeHub.vue';
+import LaneSprint from './components/LaneSprint.vue';
+import SignalTap from './components/SignalTap.vue';
 import './style.css';
 
 export default {
@@ -13,7 +17,12 @@ export default {
       'doc-after': () => h(GiscusComment),
     });
   },
-  enhanceApp({ router }) {
+  enhanceApp({ app, router }) {
+    app.component('ArcadeHub', ArcadeHub);
+    app.component('LaneSprint', LaneSprint);
+    app.component('MeteorHop', MeteorHop);
+    app.component('SignalTap', SignalTap);
+
     if (typeof window === 'undefined') return;
 
     // View Transitions 页面切换动画

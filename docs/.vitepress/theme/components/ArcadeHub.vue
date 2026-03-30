@@ -42,10 +42,10 @@
     </div>
 
     <div class="board">
-      <div class="game-frame">
-        <MeteorHop v-if="selectedGame === 'meteor-hop'" />
-        <SignalTap v-else-if="selectedGame === 'signal-tap'" />
-        <LaneSprint v-else />
+      <div ref="gameFrameRef" class="game-frame">
+        <KeepAlive>
+          <component :is="activeComponent" />
+        </KeepAlive>
       </div>
 
       <aside class="scoreboard">
@@ -67,6 +67,13 @@
               <span>{{ game.controls }}</span>
             </li>
           </ul>
+        </div>
+
+        <div class="score-panel">
+          <p class="panel-label">音效</p>
+          <button class="audio-toggle" type="button" :class="{ 'is-off': !audioEnabled }" @click="toggleAudio">
+            {{ audioEnabled ? '音效已开启' : '音效已静音' }}
+          </button>
         </div>
 
         <div class="score-panel">
@@ -98,8 +105,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { SCORE_EVENT } from '../utils/arcade';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import LaneSprint from './LaneSprint.vue';
+import MeteorHop from './MeteorHop.vue';
+import SignalTap from './SignalTap.vue';
+import { AUDIO_EVENT, SCORE_EVENT, getArcadeAudioEnabled, setArcadeAudioEnabled } from '../utils/arcade';
+import { getLocalDateKey, getPreviousDateKey, normalizeStreakState } from '../utils/arcade-progress.mjs';
+import { ARCADE_STORAGE_KEYS, readJsonStorage, readNumberStorage, writeJsonStorage } from '../utils/arcade-storage.mjs';
 
 interface GameMeta {
   id: string;
@@ -141,19 +153,26 @@ const selectedGame = ref('meteor-hop');
 const scoreMap = ref<Record<string, number>>({});
 const streak = ref({ current: 0, longest: 0, lastCompletedDate: '' });
 const toast = ref<{ title: string; body: string } | null>(null);
+const audioEnabled = ref(true);
+const gameFrameRef = ref<HTMLElement | null>(null);
 
 let toastTimer = 0;
 
-const STREAK_KEY = 'arcade-daily-streak';
-const ACHIEVEMENT_KEY = 'arcade-achievement-state';
+const STREAK_KEY = ARCADE_STORAGE_KEYS.streak;
+const ACHIEVEMENT_KEY = ARCADE_STORAGE_KEYS.achievements;
+
+const gameComponents = {
+  'meteor-hop': MeteorHop,
+  'signal-tap': SignalTap,
+  'lane-sprint': LaneSprint,
+} as const;
 
 function refreshScores() {
   if (typeof window === 'undefined') return;
 
   const nextScores: Record<string, number> = {};
   for (const game of games) {
-    const raw = Number(window.localStorage.getItem(game.storageKey) || '0');
-    nextScores[game.storageKey] = Number.isFinite(raw) ? raw : 0;
+    nextScores[game.storageKey] = readNumberStorage(game.storageKey, 0);
   }
   scoreMap.value = nextScores;
   syncChallengeProgress(nextScores);
@@ -176,8 +195,10 @@ const leaderboard = computed(() =>
     .sort((a, b) => b.score - a.score),
 );
 
+const activeComponent = computed(() => gameComponents[selectedGame.value as keyof typeof gameComponents] ?? MeteorHop);
+
 const challenge = computed(() => {
-  const data = getChallengeForDate(new Date().toISOString().slice(0, 10));
+  const data = getChallengeForDate(getLocalDateKey());
   const best = scoreMap.value[data.storageKey] ?? 0;
   const remaining = Math.max(0, data.target - best);
 
@@ -239,27 +260,24 @@ function getChallengeForDate(date: string) {
   };
 }
 
-function getYesterday(date: string) {
-  const current = new Date(`${date}T00:00:00Z`);
-  current.setUTCDate(current.getUTCDate() - 1);
-  return current.toISOString().slice(0, 10);
-}
-
 function loadStreak() {
   if (typeof window === 'undefined') return;
 
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(STREAK_KEY) || '{}') as {
+    const parsed = readJsonStorage(STREAK_KEY, {}) as {
       current?: number;
       longest?: number;
       lastCompletedDate?: string;
     };
 
-    streak.value = {
-      current: parsed.current ?? 0,
-      longest: parsed.longest ?? 0,
-      lastCompletedDate: parsed.lastCompletedDate ?? '',
-    };
+    streak.value = normalizeStreakState(
+      {
+        current: parsed.current ?? 0,
+        longest: parsed.longest ?? 0,
+        lastCompletedDate: parsed.lastCompletedDate ?? '',
+      },
+      getLocalDateKey(),
+    );
   } catch {
     streak.value = { current: 0, longest: 0, lastCompletedDate: '' };
   }
@@ -267,14 +285,14 @@ function loadStreak() {
 
 function persistStreak() {
   if (typeof window === 'undefined') return;
-  window.localStorage.setItem(STREAK_KEY, JSON.stringify(streak.value));
+  writeJsonStorage(STREAK_KEY, streak.value);
 }
 
 function readAchievementState() {
   if (typeof window === 'undefined') return {} as Record<string, boolean>;
 
   try {
-    return JSON.parse(window.localStorage.getItem(ACHIEVEMENT_KEY) || '{}') as Record<string, boolean>;
+    return readJsonStorage(ACHIEVEMENT_KEY, {}) as Record<string, boolean>;
   } catch {
     return {};
   }
@@ -282,7 +300,7 @@ function readAchievementState() {
 
 function persistAchievementState(nextState: Record<string, boolean>) {
   if (typeof window === 'undefined') return;
-  window.localStorage.setItem(ACHIEVEMENT_KEY, JSON.stringify(nextState));
+  writeJsonStorage(ACHIEVEMENT_KEY, nextState);
 }
 
 function showToast(title: string, body: string) {
@@ -296,13 +314,13 @@ function showToast(title: string, body: string) {
 function syncChallengeProgress(nextScores: Record<string, number>) {
   if (typeof window === 'undefined') return;
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getLocalDateKey();
   const todayChallenge = getChallengeForDate(today);
   const completed = (nextScores[todayChallenge.storageKey] ?? 0) >= todayChallenge.target;
 
   if (!completed || streak.value.lastCompletedDate === today) return;
 
-  const yesterday = getYesterday(today);
+  const yesterday = getPreviousDateKey(today);
   const nextCurrent = streak.value.lastCompletedDate === yesterday ? streak.value.current + 1 : 1;
   streak.value = {
     current: nextCurrent,
@@ -329,21 +347,67 @@ function syncAchievements() {
 
 function handleScoreUpdate() {
   refreshScores();
+  loadStreak();
   syncAchievements();
+}
+
+function handleAudioChange() {
+  audioEnabled.value = getArcadeAudioEnabled();
+}
+
+function handleStorageChange(event: StorageEvent) {
+  if (!event.key) {
+    handleScoreUpdate();
+    handleAudioChange();
+    return;
+  }
+
+  if (
+    event.key === STREAK_KEY ||
+    event.key === ACHIEVEMENT_KEY ||
+    games.some((game) => game.storageKey === event.key)
+  ) {
+    handleScoreUpdate();
+  }
+
+  if (event.key === ARCADE_STORAGE_KEYS.audioEnabled) {
+    handleAudioChange();
+  }
+}
+
+function toggleAudio() {
+  setArcadeAudioEnabled(!audioEnabled.value);
+}
+
+async function focusActiveGame() {
+  await nextTick();
+  const root = gameFrameRef.value;
+  if (!root) return;
+
+  const focusTarget = root.querySelector<HTMLElement>('[tabindex="0"], button:not([disabled])');
+  focusTarget?.focus();
 }
 
 onMounted(() => {
   loadStreak();
   refreshScores();
   syncAchievements();
+  audioEnabled.value = getArcadeAudioEnabled();
+  void focusActiveGame();
+  window.addEventListener(AUDIO_EVENT, handleAudioChange);
   window.addEventListener(SCORE_EVENT, handleScoreUpdate);
-  window.addEventListener('storage', handleScoreUpdate);
+  window.addEventListener('storage', handleStorageChange);
+});
+
+watch(selectedGame, () => {
+  void focusActiveGame();
 });
 
 onUnmounted(() => {
   window.clearTimeout(toastTimer);
+  window.removeEventListener(AUDIO_EVENT, handleAudioChange);
   window.removeEventListener(SCORE_EVENT, handleScoreUpdate);
-  window.removeEventListener('storage', handleScoreUpdate);
+  window.removeEventListener('storage', handleStorageChange);
 });
 </script>
 
@@ -553,6 +617,22 @@ onUnmounted(() => {
 
 .score-panel strong {
   color: #fff;
+}
+
+.audio-toggle {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 0.85rem 0.95rem;
+  color: #06111f;
+  font-weight: 700;
+  background: linear-gradient(135deg, #9af2ff, #ffd57c);
+  cursor: pointer;
+}
+
+.audio-toggle.is-off {
+  color: rgba(228, 237, 248, 0.86);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .achievement-list li {

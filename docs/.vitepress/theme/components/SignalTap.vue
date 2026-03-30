@@ -62,10 +62,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onActivated, onDeactivated, onMounted, onUnmounted, ref } from 'vue';
 import { dispatchArcadeScoreUpdate, playArcadeTone } from '../utils/arcade';
+import { ARCADE_STORAGE_KEYS, readNumberStorage, writeNumberStorage } from '../utils/arcade-storage.mjs';
+import { getRemainingRoundTime, getResumeRoundTime } from '../utils/signal-tap-round.mjs';
+import { getMissPlan } from '../utils/signal-tap-state.mjs';
+import { createSignalTapTimers } from '../utils/signal-tap-timers.mjs';
+import { getSignalTapPauseSnapshot } from '../utils/signal-tap-visibility.mjs';
 
-const STORAGE_KEY = 'signal-tap-best-score';
+const STORAGE_KEY = ARCADE_STORAGE_KEYS.signalTapBest;
 const CELL_COUNT = 9;
 
 const cells = Array.from({ length: CELL_COUNT }, (_, index) => index);
@@ -77,31 +82,42 @@ const lives = ref(3);
 const activeDuration = ref(1200);
 const status = ref<'idle' | 'running' | 'over'>('idle');
 const flashMiss = ref(false);
+const wasRunningBeforeHide = ref(false);
+const roundRemaining = ref(0);
+const roundDeadline = ref(0);
 
-let roundTimer = 0;
-let missFlashTimer = 0;
+const timers =
+  typeof window !== 'undefined'
+    ? createSignalTapTimers(window)
+    : createSignalTapTimers({
+        setTimeout,
+        clearTimeout,
+      });
 
 function loadBestScore() {
   if (typeof window === 'undefined') return;
-  const saved = Number(window.localStorage.getItem(STORAGE_KEY) || '0');
-  bestScore.value = Number.isFinite(saved) ? saved : 0;
+  bestScore.value = readNumberStorage(STORAGE_KEY, 0);
   dispatchArcadeScoreUpdate('Signal Tap', STORAGE_KEY, bestScore.value);
 }
 
 function persistBestScore() {
   if (typeof window === 'undefined') return;
-  window.localStorage.setItem(STORAGE_KEY, String(bestScore.value));
+  writeNumberStorage(STORAGE_KEY, bestScore.value);
   dispatchArcadeScoreUpdate('Signal Tap', STORAGE_KEY, bestScore.value);
 }
 
 function clearTimers() {
-  window.clearTimeout(roundTimer);
-  window.clearTimeout(missFlashTimer);
+  timers.cancelAll();
+}
+
+function getNow() {
+  return typeof performance !== 'undefined' ? performance.now() : Date.now();
 }
 
 function endGame() {
   status.value = 'over';
   activeCell.value = -1;
+  flashMiss.value = false;
   clearTimers();
   playArcadeTone({ frequency: 210, sweepTo: 120, duration: 0.26, gain: 0.08, type: 'sawtooth' });
 
@@ -120,15 +136,17 @@ function chooseNextCell() {
 }
 
 function triggerMiss() {
-  lives.value -= 1;
+  const missPlan = getMissPlan(lives.value);
+  lives.value = missPlan.nextLives;
   flashMiss.value = true;
   playArcadeTone({ frequency: 250, sweepTo: 180, duration: 0.16, gain: 0.05, type: 'square' });
-  window.clearTimeout(missFlashTimer);
-  missFlashTimer = window.setTimeout(() => {
-    flashMiss.value = false;
-  }, 220);
+  if (missPlan.shouldScheduleFlashReset) {
+    timers.scheduleMissFlashReset(() => {
+      flashMiss.value = false;
+    }, 220);
+  }
 
-  if (lives.value <= 0) {
+  if (missPlan.shouldEndGame) {
     endGame();
     return;
   }
@@ -137,12 +155,19 @@ function triggerMiss() {
 }
 
 function queueRound() {
-  clearTimers();
   chooseNextCell();
-  roundTimer = window.setTimeout(() => {
+  roundRemaining.value = activeDuration.value;
+  scheduleRound(roundRemaining.value);
+}
+
+function scheduleRound(delay = activeDuration.value) {
+  roundRemaining.value = delay;
+  roundDeadline.value = getNow() + delay;
+  timers.scheduleRound(() => {
     if (status.value !== 'running') return;
+    roundRemaining.value = 0;
     triggerMiss();
-  }, activeDuration.value);
+  }, delay);
 }
 
 function startGame() {
@@ -169,6 +194,23 @@ function hitCell(cell: number) {
 
 onMounted(() => {
   loadBestScore();
+});
+
+onActivated(() => {
+  if (!wasRunningBeforeHide.value || status.value !== 'running' || activeCell.value === -1) return;
+  scheduleRound(getResumeRoundTime(roundRemaining.value, activeDuration.value));
+});
+
+onDeactivated(() => {
+  const pauseSnapshot = getSignalTapPauseSnapshot({
+    status: status.value,
+    roundDeadline: roundDeadline.value,
+    now: getNow(),
+  });
+  wasRunningBeforeHide.value = pauseSnapshot.wasRunning;
+  roundRemaining.value = pauseSnapshot.roundRemaining;
+  flashMiss.value = pauseSnapshot.flashMiss;
+  clearTimers();
 });
 
 onUnmounted(() => {

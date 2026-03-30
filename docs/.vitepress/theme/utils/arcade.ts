@@ -1,4 +1,6 @@
 const SCORE_EVENT = 'arcade-score-update';
+const AUDIO_EVENT = 'arcade-audio-change';
+import { ARCADE_STORAGE_KEYS, readBooleanFlagStorage, writeBooleanFlagStorage } from './arcade-storage.mjs';
 
 let audioContext: AudioContext | null = null;
 
@@ -30,6 +32,20 @@ export function dispatchArcadeScoreUpdate(game: string, storageKey: string, scor
   );
 }
 
+export function getArcadeAudioEnabled() {
+  return readBooleanFlagStorage(ARCADE_STORAGE_KEYS.audioEnabled, true);
+}
+
+export function setArcadeAudioEnabled(enabled: boolean) {
+  if (typeof window === 'undefined') return;
+  writeBooleanFlagStorage(ARCADE_STORAGE_KEYS.audioEnabled, enabled);
+  window.dispatchEvent(
+    new CustomEvent(AUDIO_EVENT, {
+      detail: { enabled },
+    }),
+  );
+}
+
 export function playArcadeTone(options: {
   frequency: number;
   duration?: number;
@@ -37,6 +53,7 @@ export function playArcadeTone(options: {
   type?: OscillatorType;
   sweepTo?: number;
 }) {
+  if (!getArcadeAudioEnabled()) return;
   const context = getAudioContext();
   if (!context) return;
 
@@ -61,4 +78,4 @@ export function playArcadeTone(options: {
   oscillator.stop(now + (options.duration ?? 0.18));
 }
 
-export { SCORE_EVENT };
+export { AUDIO_EVENT, SCORE_EVENT };

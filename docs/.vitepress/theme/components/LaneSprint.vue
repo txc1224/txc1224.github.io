@@ -88,8 +88,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onActivated, onDeactivated, onMounted, onUnmounted, ref } from 'vue';
 import { dispatchArcadeScoreUpdate, playArcadeTone } from '../utils/arcade';
+import { ARCADE_STORAGE_KEYS, readNumberStorage, writeNumberStorage } from '../utils/arcade-storage.mjs';
+import { getLaneChange } from '../utils/lane-sprint-state.mjs';
 
 interface Obstacle {
   id: number;
@@ -99,7 +101,7 @@ interface Obstacle {
   passed: boolean;
 }
 
-const STORAGE_KEY = 'lane-sprint-best-score';
+const STORAGE_KEY = ARCADE_STORAGE_KEYS.laneSprintBest;
 const LANE_COUNT = 4;
 const ARENA_HEIGHT = 360;
 const PLAYER_Y = 270;
@@ -120,6 +122,7 @@ let lastTime = 0;
 let spawnTimer = 0;
 let obstacleId = 0;
 let resizeObserver: ResizeObserver | null = null;
+let isLoopActive = false;
 
 const laneWidth = computed(() => arenaWidth.value / LANE_COUNT);
 
@@ -129,14 +132,13 @@ function dispatchScoreUpdate() {
 
 function loadBestScore() {
   if (typeof window === 'undefined') return;
-  const saved = Number(window.localStorage.getItem(STORAGE_KEY) || '0');
-  bestScore.value = Number.isFinite(saved) ? saved : 0;
+  bestScore.value = readNumberStorage(STORAGE_KEY, 0);
   dispatchScoreUpdate();
 }
 
 function persistBestScore() {
   if (typeof window === 'undefined') return;
-  window.localStorage.setItem(STORAGE_KEY, String(bestScore.value));
+  writeNumberStorage(STORAGE_KEY, bestScore.value);
   dispatchScoreUpdate();
 }
 
@@ -160,8 +162,10 @@ function resetGame() {
 }
 
 function setLane(nextLane: number) {
-  playerLane.value = Math.max(0, Math.min(LANE_COUNT - 1, nextLane));
+  const laneChange = getLaneChange(playerLane.value, nextLane, LANE_COUNT);
+  playerLane.value = laneChange.lane;
   arenaRef.value?.focus();
+  if (!laneChange.changed) return;
   playArcadeTone({ frequency: 380 + playerLane.value * 80, duration: 0.06, gain: 0.03, type: 'square' });
 }
 
@@ -198,6 +202,7 @@ function startGame() {
 }
 
 function tick(timestamp: number) {
+  if (!isLoopActive) return;
   rafId = requestAnimationFrame(tick);
 
   if (status.value !== 'running') {
@@ -243,6 +248,18 @@ function tick(timestamp: number) {
   }
 }
 
+function startLoop() {
+  if (isLoopActive) return;
+  isLoopActive = true;
+  lastTime = 0;
+  rafId = requestAnimationFrame(tick);
+}
+
+function stopLoop() {
+  isLoopActive = false;
+  cancelAnimationFrame(rafId);
+}
+
 onMounted(() => {
   loadBestScore();
   setArenaWidth();
@@ -253,11 +270,19 @@ onMounted(() => {
     resizeObserver.observe(arenaRef.value);
   }
 
-  rafId = requestAnimationFrame(tick);
+  startLoop();
+});
+
+onActivated(() => {
+  startLoop();
+});
+
+onDeactivated(() => {
+  stopLoop();
 });
 
 onUnmounted(() => {
-  cancelAnimationFrame(rafId);
+  stopLoop();
   resizeObserver?.disconnect();
 });
 </script>

@@ -78,8 +78,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { computed, onActivated, onDeactivated, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { dispatchArcadeScoreUpdate, playArcadeTone } from '../utils/arcade';
+import { ARCADE_STORAGE_KEYS, readNumberStorage, writeNumberStorage } from '../utils/arcade-storage.mjs';
+import { canMeteorHopJump } from '../utils/meteor-hop-state.mjs';
 
 interface Obstacle {
   id: number;
@@ -105,7 +107,7 @@ const GRAVITY = 1800;
 const JUMP_VELOCITY = 760;
 const BASE_SPEED = 360;
 const MAX_SPEED = 760;
-const STORAGE_KEY = 'meteor-hop-best-score';
+const STORAGE_KEY = ARCADE_STORAGE_KEYS.meteorHopBest;
 
 const arenaRef = ref<HTMLDivElement | null>(null);
 const arenaWidth = ref(920);
@@ -133,6 +135,7 @@ let lastTime = 0;
 let spawnTimer = 0;
 let obstacleId = 0;
 let resizeObserver: ResizeObserver | null = null;
+let isLoopActive = false;
 
 const speedText = computed(() => `${Math.round(state.speed)} px/s`);
 
@@ -180,7 +183,7 @@ function resetGame() {
 
 function storeBestScore() {
   if (typeof window === 'undefined') return;
-  window.localStorage.setItem(STORAGE_KEY, String(bestScore.value));
+  writeNumberStorage(STORAGE_KEY, bestScore.value);
   dispatchArcadeScoreUpdate('Meteor Hop', STORAGE_KEY, bestScore.value);
 }
 
@@ -201,7 +204,7 @@ function endGame() {
 }
 
 function jump() {
-  if (state.y > 6) return;
+  if (!canMeteorHopJump(state.y, state.velocity)) return;
   state.velocity = JUMP_VELOCITY;
   playArcadeTone({ frequency: 480, sweepTo: 720, duration: 0.12, gain: 0.045, type: 'triangle' });
 }
@@ -248,6 +251,7 @@ function intersects(obstacle: Obstacle) {
 }
 
 function tick(timestamp: number) {
+  if (!isLoopActive) return;
   rafId = requestAnimationFrame(tick);
 
   if (state.status !== 'running') {
@@ -296,10 +300,21 @@ function tick(timestamp: number) {
   }
 }
 
+function startLoop() {
+  if (isLoopActive) return;
+  isLoopActive = true;
+  lastTime = 0;
+  rafId = requestAnimationFrame(tick);
+}
+
+function stopLoop() {
+  isLoopActive = false;
+  cancelAnimationFrame(rafId);
+}
+
 onMounted(() => {
   if (typeof window !== 'undefined') {
-    const savedScore = Number(window.localStorage.getItem(STORAGE_KEY) || '0');
-    bestScore.value = Number.isFinite(savedScore) ? savedScore : 0;
+    bestScore.value = readNumberStorage(STORAGE_KEY, 0);
     dispatchArcadeScoreUpdate('Meteor Hop', STORAGE_KEY, bestScore.value);
   }
 
@@ -310,11 +325,19 @@ onMounted(() => {
   }
 
   resetGame();
-  rafId = requestAnimationFrame(tick);
+  startLoop();
+});
+
+onActivated(() => {
+  startLoop();
+});
+
+onDeactivated(() => {
+  stopLoop();
 });
 
 onUnmounted(() => {
-  cancelAnimationFrame(rafId);
+  stopLoop();
   resizeObserver?.disconnect();
 });
 </script>

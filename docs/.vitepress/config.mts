@@ -69,6 +69,7 @@ const config = withMermaid(
           text: '工具',
           items: [{ text: 'Git', link: '/git/' }],
         },
+        { text: '全网热榜实时聚合', link: 'https://txc1224.github.io/daily-digest/' },
         { text: '小游戏', link: '/playground/' },
         { text: '每日科技资讯', link: '/daily-tech/' },
         { text: '收藏导航', link: '/bookmarks/' },

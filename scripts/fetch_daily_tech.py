@@ -10,12 +10,9 @@ import json
 import datetime
 import re
 import requests
-import feedparser
 import uuid
 import time
 from urllib.parse import quote, urlparse, parse_qs, unquote
-
-from bs4 import BeautifulSoup
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
@@ -114,6 +111,80 @@ RSS_GROUP_TITLES = {
     "tech_news": "科技深度（MIT TR & Ars Technica）",
     "reddit": "社区热议（Reddit）",
 }
+
+NOISE_PATTERNS = [
+    r"self[\s-]?promotion",
+    r"who(?:'s|\s+is)?\s+hiring",
+    r"who\s+wants\s+to\s+be\s+hired",
+    r"state of the subreddit",
+    r"subreddit.*mods?",
+    r"monthly.*hiring",
+    r"monthly.*job",
+    r"自我推广",
+    r"自我宣传",
+    r"自我推销",
+    r"招聘和求职",
+    r"每月招聘",
+    r"月度招聘",
+    r"管理员申请",
+    r"规则更新",
+    r"社区状态报告",
+    r"社群状态报告",
+]
+
+LOW_SIGNAL_SUMMARIES = {"-", "", "…"}
+
+
+def normalize_title_key(text: str) -> str:
+    """将标题规范化为便于去重的 key"""
+    text = text.lower().strip()
+    text = re.sub(r"https?://\S+", "", text)
+    text = re.sub(r"[\[\]\(\)\-–—:：!！?？'\"`.,，。/]+", " ", text)
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
+
+
+def is_noise_title(title: str) -> bool:
+    """过滤重复出现的固定帖、招聘贴、社区公告等低价值条目"""
+    normalized = normalize_title_key(title)
+    return any(re.search(pattern, normalized, re.IGNORECASE) for pattern in NOISE_PATTERNS)
+
+
+def dedupe_items(items: list[dict], title_key: str = "title", url_key: str = "url") -> list[dict]:
+    """按 url 和标准化标题去重，保留顺序"""
+    seen_urls = set()
+    seen_titles = set()
+    result = []
+
+    for item in items:
+        title = str(item.get(title_key, "")).strip()
+        url = str(item.get(url_key, "")).strip()
+        title_norm = normalize_title_key(title)
+        url_norm = url.split("#")[0].rstrip("/")
+
+        if url_norm and url_norm in seen_urls:
+            continue
+        if title_norm and title_norm in seen_titles:
+            continue
+
+        if url_norm:
+            seen_urls.add(url_norm)
+        if title_norm:
+            seen_titles.add(title_norm)
+        result.append(item)
+
+    return result
+
+
+def filter_content_items(items: list[dict], title_key: str = "title") -> list[dict]:
+    """移除明显噪音后再做去重"""
+    filtered = [item for item in items if not is_noise_title(str(item.get(title_key, "")))]
+    return dedupe_items(filtered, title_key=title_key)
+
+
+def trim_items(items: list[dict], limit: int) -> list[dict]:
+    """统一裁剪数量，避免经过过滤后又超出展示上限"""
+    return items[:limit]
 
 
 def fetch_hn_stories(query: str, n: int = 5) -> list[dict]:
@@ -239,6 +310,8 @@ def fetch_weibo_hot(keywords: list[str] = None) -> list[dict]:
 
 def fetch_duckduckgo(query: str, n: int = 5) -> list[dict]:
     """DuckDuckGo HTML 版搜索，无 API key，反爬最宽松"""
+    from bs4 import BeautifulSoup
+
     try:
         resp = requests.get(
             "https://html.duckduckgo.com/html/",
@@ -317,6 +390,8 @@ def fetch_github_trending(n: int = 8) -> list[dict]:
 
 def fetch_rss(url: str, n: int = 5, timeout: int = 15, source_type: str = "") -> list[dict]:
     """通用 RSS 抓取函数，返回统一格式条目列表"""
+    import feedparser
+
     headers = {
         "User-Agent": "Mozilla/5.0 (compatible; DailyTechBot/1.0; +https://github.com/txc1224/txc1224.github.io)"
     }
@@ -672,7 +747,7 @@ def main():
     for section, query in HN_QUERIES.items():
         print(f"[INFO] 抓取 HN [{section}]...")
         items = fetch_hn_stories(query, HN_PER_SECTION)
-        hn_sections_raw[section] = items
+        hn_sections_raw[section] = trim_items(filter_content_items(items), HN_PER_SECTION)
 
     # 批量翻译 HN 标题
     all_titles = []
@@ -697,6 +772,7 @@ def main():
     # 抓取 GitHub Trending 并翻译描述
     print("[INFO] 抓取 GitHub Trending...")
     trending = fetch_github_trending(GITHUB_TRENDING_N)
+    trending = trim_items(dedupe_items(trending, title_key="name"), GITHUB_TRENDING_N)
     for repo in trending:
         desc = repo.get("description", "")
         if desc:
@@ -714,9 +790,13 @@ def main():
         items = fetch_rss(url, limit, source_type=source_type)
         for item in items:
             item["source_name"] = name
+        items = trim_items(filter_content_items(items), limit)
         if group not in rss_groups:
             rss_groups[group] = []
         rss_groups[group].extend(items)
+
+    for group in list(rss_groups.keys()):
+        rss_groups[group] = trim_items(filter_content_items(rss_groups[group]), 8)
 
     # 批量翻译所有 RSS 条目标题（区分 arXiv 模式）
     all_rss_titles = []
@@ -746,10 +826,12 @@ def main():
     for q in BILI_QUERIES:
         bili_items.extend(fetch_bilibili(q, BILI_PER_QUERY))
         time.sleep(2)
+    bili_items = trim_items(filter_content_items(bili_items), 5)
 
     # ── 中文热点：微博热搜 ──
     print("[INFO] 抓取微博热搜...")
     weibo_items = fetch_weibo_hot()
+    weibo_items = trim_items(filter_content_items(weibo_items), 5)
 
     # ── DuckDuckGo 补充热点 ──
     print("[INFO] DuckDuckGo 补充搜索...")
@@ -757,6 +839,7 @@ def main():
     for q in DDG_QUERIES:
         ddg_items.extend(fetch_duckduckgo(q, DDG_PER_QUERY))
         time.sleep(3)
+    ddg_items = trim_items(filter_content_items(ddg_items), 8)
 
     # 生成 MD 文件
     os.makedirs(DOCS_DIR, exist_ok=True)

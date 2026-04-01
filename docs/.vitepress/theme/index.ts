@@ -1,27 +1,34 @@
-import { h, nextTick } from 'vue';
+import { defineAsyncComponent, nextTick } from 'vue';
 import type { Theme } from 'vitepress';
 import DefaultTheme from 'vitepress/theme';
-import SakuraCanvas from './components/SakuraCanvas.vue';
-import GiscusComment from './components/GiscusComment.vue';
-import MeteorHop from './components/MeteorHop.vue';
-import ArcadeHub from './components/ArcadeHub.vue';
-import LaneSprint from './components/LaneSprint.vue';
-import SignalTap from './components/SignalTap.vue';
+import Layout from './Layout.vue';
+import MusicPlayer from './components/MusicPlayer.vue';
 import './style.css';
+
+const ArcadeHub = defineAsyncComponent(() => import('./components/ArcadeHub.vue'));
+const LaneSprint = defineAsyncComponent(() => import('./components/LaneSprint.vue'));
+const MeteorHop = defineAsyncComponent(() => import('./components/MeteorHop.vue'));
+const SignalTap = defineAsyncComponent(() => import('./components/SignalTap.vue'));
+const HomeDiscover = defineAsyncComponent(() => import('./components/HomeDiscover.vue'));
+const HomeStage = defineAsyncComponent(() => import('./components/HomeStage.vue'));
+const ArchiveExplorer = defineAsyncComponent(() => import('./components/ArchiveExplorer.vue'));
+const TagExplorer = defineAsyncComponent(() => import('./components/TagExplorer.vue'));
+const DailyDigestHub = defineAsyncComponent(() => import('./components/DailyDigestHub.vue'));
 
 export default {
   extends: DefaultTheme,
-  Layout: () => {
-    return h(DefaultTheme.Layout, null, {
-      'layout-top': () => h(SakuraCanvas),
-      'doc-after': () => h(GiscusComment),
-    });
-  },
+  Layout,
   enhanceApp({ app, router }) {
     app.component('ArcadeHub', ArcadeHub);
     app.component('LaneSprint', LaneSprint);
     app.component('MeteorHop', MeteorHop);
     app.component('SignalTap', SignalTap);
+    app.component('HomeDiscover', HomeDiscover);
+    app.component('HomeStage', HomeStage);
+    app.component('ArchiveExplorer', ArchiveExplorer);
+    app.component('TagExplorer', TagExplorer);
+    app.component('DailyDigestHub', DailyDigestHub);
+    app.component('MusicPlayer', MusicPlayer);
 
     if (typeof window === 'undefined') return;
 

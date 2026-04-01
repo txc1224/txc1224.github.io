@@ -1,4 +1,6 @@
 import { createRequire } from 'node:module';
+import { readdirSync } from 'node:fs';
+import path from 'node:path';
 import { defineConfig } from 'vitepress';
 import { withMermaid } from 'vitepress-plugin-mermaid';
 import { generateSidebar } from 'vitepress-sidebar';
@@ -9,6 +11,106 @@ const require = createRequire(import.meta.url);
 const dayjsEsmEntry = require.resolve('dayjs/esm/index.js');
 const sanitizeUrlShim = require.resolve('./theme/utils/sanitize-url-shim.mjs');
 const sanitizeUrlEntry = require.resolve('@braintree/sanitize-url/dist/index.js');
+const docsRoot = path.resolve(process.cwd(), 'docs');
+
+function createDailyTechSidebar() {
+  const dailyTechDir = path.join(docsRoot, 'daily-tech');
+  const entries = readdirSync(dailyTechDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && /^\d{4}-\d{2}-\d{2}\.md$/.test(entry.name))
+    .map((entry) => entry.name.replace(/\.md$/, ''))
+    .sort((a, b) => b.localeCompare(a, 'en'));
+
+  const groups = new Map<string, string[]>();
+
+  for (const slug of entries) {
+    const monthKey = slug.slice(0, 7);
+    const list = groups.get(monthKey) ?? [];
+    list.push(slug);
+    groups.set(monthKey, list);
+  }
+
+  return [
+    {
+      text: '总览',
+      items: [{ text: '每日科技资讯', link: '/daily-tech/' }],
+    },
+    ...Array.from(groups.entries()).map(([monthKey, slugs]) => {
+      const [year, month] = monthKey.split('-');
+      return {
+        text: `${year} 年 ${month} 月`,
+        collapsed: true,
+        items: slugs.map((slug) => ({
+          text: slug,
+          link: `/daily-tech/${slug}`,
+        })),
+      };
+    }),
+  ];
+}
+
+const generatedSidebar = generateSidebar([
+  {
+    documentRootPath: '/docs',
+    scanStartPath: 'js',
+    resolvePath: '/js/',
+    useTitleFromFrontmatter: true,
+    sortMenusByFrontmatterOrder: true,
+  },
+  {
+    documentRootPath: '/docs',
+    scanStartPath: 'node',
+    resolvePath: '/node/',
+    useTitleFromFrontmatter: true,
+    sortMenusByFrontmatterOrder: true,
+  },
+  {
+    documentRootPath: '/docs',
+    scanStartPath: 'python',
+    resolvePath: '/python/',
+    useTitleFromFrontmatter: true,
+    sortMenusByFrontmatterOrder: true,
+  },
+  {
+    documentRootPath: '/docs',
+    scanStartPath: 'java',
+    resolvePath: '/java/',
+    useTitleFromFrontmatter: true,
+    sortMenusByFrontmatterOrder: true,
+  },
+  {
+    documentRootPath: '/docs',
+    scanStartPath: 'git',
+    resolvePath: '/git/',
+    useTitleFromFrontmatter: true,
+    sortMenusByFrontmatterOrder: true,
+  },
+  {
+    documentRootPath: '/docs',
+    scanStartPath: 'vue',
+    resolvePath: '/vue/',
+    useTitleFromFrontmatter: true,
+    sortMenusByFrontmatterOrder: true,
+  },
+  {
+    documentRootPath: '/docs',
+    scanStartPath: 'react',
+    resolvePath: '/react/',
+    useTitleFromFrontmatter: true,
+    sortMenusByFrontmatterOrder: true,
+  },
+  {
+    documentRootPath: '/docs',
+    scanStartPath: 'playground',
+    resolvePath: '/playground/',
+    useTitleFromFrontmatter: true,
+  },
+  {
+    documentRootPath: '/docs',
+    scanStartPath: 'bookmarks',
+    resolvePath: '/bookmarks/',
+    useTitleFromFrontmatter: true,
+  },
+]);
 
 const config = withMermaid(
   defineConfig({
@@ -17,10 +119,13 @@ const config = withMermaid(
     appearance: 'dark',
     lastUpdated: true,
     head: [
+      ['link', { rel: 'icon', type: 'image/png', href: '/kuromi-512.png' }],
+      ['link', { rel: 'apple-touch-icon', href: '/kuromi-512.png' }],
       ['meta', { property: 'og:type', content: 'website' }],
       ['meta', { property: 'og:title', content: 'txc 技术备忘录' }],
       ['meta', { property: 'og:description', content: '记录开发中遇到的知识点、踩坑与最佳实践' }],
       ['meta', { property: 'og:url', content: 'https://txc1224.github.io' }],
+      ['link', { rel: 'alternate', type: 'application/rss+xml', title: '每日科技资讯 RSS', href: '/daily-tech.xml' }],
     ],
     sitemap: {
       hostname: 'https://txc1224.github.io',
@@ -67,82 +172,21 @@ const config = withMermaid(
         },
         {
           text: '工具',
-          items: [{ text: 'Git', link: '/git/' }],
+          items: [
+            { text: 'Git', link: '/git/' },
+            { text: '归档', link: '/archive/' },
+            { text: '标签', link: '/tags/' },
+          ],
         },
         { text: '全网热榜实时聚合', link: 'https://txc1224.github.io/daily-digest/' },
         { text: '小游戏', link: '/playground/' },
         { text: '每日科技资讯', link: '/daily-tech/' },
         { text: '收藏导航', link: '/bookmarks/' },
       ],
-      sidebar: generateSidebar([
-        {
-          documentRootPath: '/docs',
-          scanStartPath: 'js',
-          resolvePath: '/js/',
-          useTitleFromFrontmatter: true,
-          sortMenusByFrontmatterOrder: true,
-        },
-        {
-          documentRootPath: '/docs',
-          scanStartPath: 'node',
-          resolvePath: '/node/',
-          useTitleFromFrontmatter: true,
-          sortMenusByFrontmatterOrder: true,
-        },
-        {
-          documentRootPath: '/docs',
-          scanStartPath: 'python',
-          resolvePath: '/python/',
-          useTitleFromFrontmatter: true,
-          sortMenusByFrontmatterOrder: true,
-        },
-        {
-          documentRootPath: '/docs',
-          scanStartPath: 'java',
-          resolvePath: '/java/',
-          useTitleFromFrontmatter: true,
-          sortMenusByFrontmatterOrder: true,
-        },
-        {
-          documentRootPath: '/docs',
-          scanStartPath: 'git',
-          resolvePath: '/git/',
-          useTitleFromFrontmatter: true,
-          sortMenusByFrontmatterOrder: true,
-        },
-        {
-          documentRootPath: '/docs',
-          scanStartPath: 'vue',
-          resolvePath: '/vue/',
-          useTitleFromFrontmatter: true,
-          sortMenusByFrontmatterOrder: true,
-        },
-        {
-          documentRootPath: '/docs',
-          scanStartPath: 'react',
-          resolvePath: '/react/',
-          useTitleFromFrontmatter: true,
-          sortMenusByFrontmatterOrder: true,
-        },
-        {
-          documentRootPath: '/docs',
-          scanStartPath: 'playground',
-          resolvePath: '/playground/',
-          useTitleFromFrontmatter: true,
-        },
-        {
-          documentRootPath: '/docs',
-          scanStartPath: 'daily-tech',
-          resolvePath: '/daily-tech/',
-          useTitleFromFrontmatter: true,
-        },
-        {
-          documentRootPath: '/docs',
-          scanStartPath: 'bookmarks',
-          resolvePath: '/bookmarks/',
-          useTitleFromFrontmatter: true,
-        },
-      ]),
+      sidebar: {
+        ...generatedSidebar,
+        '/daily-tech/': createDailyTechSidebar(),
+      },
       editLink: {
         pattern: 'https://github.com/txc1224/txc1224.github.io/edit/main/docs/:path',
         text: '在 GitHub 上编辑此页',

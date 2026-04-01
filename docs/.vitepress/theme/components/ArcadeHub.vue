@@ -105,13 +105,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-import LaneSprint from './LaneSprint.vue';
-import MeteorHop from './MeteorHop.vue';
-import SignalTap from './SignalTap.vue';
+import { computed, defineAsyncComponent, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { AUDIO_EVENT, SCORE_EVENT, getArcadeAudioEnabled, setArcadeAudioEnabled } from '../utils/arcade';
 import { getLocalDateKey, getPreviousDateKey, normalizeStreakState } from '../utils/arcade-progress.mjs';
 import { ARCADE_STORAGE_KEYS, readJsonStorage, readNumberStorage, writeJsonStorage } from '../utils/arcade-storage.mjs';
+
+const MeteorHop = defineAsyncComponent(() => import('./MeteorHop.vue'));
+const SignalTap = defineAsyncComponent(() => import('./SignalTap.vue'));
+const LaneSprint = defineAsyncComponent(() => import('./LaneSprint.vue'));
 
 interface GameMeta {
   id: string;

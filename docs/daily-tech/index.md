@@ -12,6 +12,7 @@ description: '每天自动聚合 HackerNews 热门文章与 GitHub Trending 项�
 ## 最新文章
 
 <!-- DAILY_TECH_INDEX_START -->
+- [2026-06-01](/daily-tech/2026-06-01)
 - [2026-05-31](/daily-tech/2026-05-31)
 - [2026-05-30](/daily-tech/2026-05-30)
 - [2026-05-29](/daily-tech/2026-05-29)
@@ -41,5 +42,4 @@ description: '每天自动聚合 HackerNews 热门文章与 GitHub Trending 项�
 - [2026-05-03](/daily-tech/2026-05-03)
 - [2026-05-02](/daily-tech/2026-05-02)
 - [2026-05-01](/daily-tech/2026-05-01)
-- [2026-04-30](/daily-tech/2026-04-30)
 <!-- DAILY_TECH_INDEX_END -->

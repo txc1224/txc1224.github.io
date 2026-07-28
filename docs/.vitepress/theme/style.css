@@ -445,8 +445,8 @@
   grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
   gap: 28px;
   align-items: stretch;
-  transform: translate3d(0, calc(var(--txc-stage-progress) * -22px), 0);
-  opacity: calc(1 - (var(--txc-stage-progress) * 0.16));
+  transform: translate3d(0, calc(var(--txc-stage-progress) * -90px), 0);
+  opacity: calc(1 - (var(--txc-stage-progress) * 0.35));
 }
 
 .home-stage__copy,
@@ -604,19 +604,19 @@
   will-change: transform;
   transform: translate3d(
       var(--txc-stage-parallax-x),
-      calc(var(--txc-stage-parallax-y) + (var(--txc-stage-progress) * -28px)),
+      calc(var(--txc-stage-parallax-y) + (var(--txc-stage-progress) * -70px)),
       0
     )
-    scale(calc(1 - (var(--txc-stage-progress) * 0.035)));
+    scale(calc(1 - (var(--txc-stage-progress) * 0.08)));
 }
 
 .home-stage.home-motion.is-visible .home-stage__visual {
   transform: translate3d(
       var(--txc-stage-parallax-x),
-      calc(var(--txc-stage-parallax-y) + (var(--txc-stage-progress) * -28px)),
+      calc(var(--txc-stage-parallax-y) + (var(--txc-stage-progress) * -70px)),
       0
     )
-    scale(calc(1 - (var(--txc-stage-progress) * 0.035)));
+    scale(calc(1 - (var(--txc-stage-progress) * 0.08)));
 }
 
 .home-stage__float-card {

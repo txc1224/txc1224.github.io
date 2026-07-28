@@ -109,8 +109,13 @@ function resetParallax() {
 function syncPinProgress() {
   if (!stageRef.value || typeof window === 'undefined') return;
   const rect = stageRef.value.getBoundingClientRect();
+  // 以「元素顶部距视口顶」为基准,一开始就渐进;offsetTop 之前的滚动也计入,让效果更早、更顺滑
   const scrollable = Math.max(stageRef.value.offsetHeight - window.innerHeight, 1);
-  const passed = Math.min(Math.max(-rect.top, 0), scrollable);
+  const startOffset = stageRef.value.offsetTop; // 元素距文档顶的距离(含 nav)
+  const passed = Math.min(
+    Math.max(window.scrollY - Math.max(startOffset - window.innerHeight * 0.15, 0), 0),
+    scrollable,
+  );
   pinProgress.value = Number((passed / scrollable).toFixed(3));
 }
 

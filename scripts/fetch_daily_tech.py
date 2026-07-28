@@ -135,6 +135,13 @@ NOISE_PATTERNS = [
 LOW_SIGNAL_SUMMARIES = {"-", "", "…"}
 
 
+def md_escape(text: str) -> str:
+    """转义会破坏 Vue/Markdown 编译的尖括号等特殊字符。"""
+    if not isinstance(text, str):
+        return text
+    return text.replace("<", "&lt;").replace(">", "&gt;")
+
+
 def normalize_title_key(text: str) -> str:
     """将标题规范化为便于去重的 key"""
     text = text.lower().strip()
@@ -625,7 +632,7 @@ def generate_daily_md(
             url = item["url"]
             points = item.get("points", 0)
             comments = item.get("comments", 0)
-            lines.append(f"| [{title_zh}]({url}) | {summary} | ⬆{points} 💬{comments} |")
+            lines.append(f"| [{md_escape(title_zh)}]({url}) | {md_escape(summary)} | ⬆{points} 💬{comments} |")
         lines.append("")
 
     if trending:
@@ -640,7 +647,7 @@ def generate_daily_md(
             desc = repo.get("desc_zh") or repo.get("description") or "-"
             stars = format_stars(repo.get("stars", 0))
             lang = repo.get("language") or "-"
-            lines.append(f"| [{author}/{name}]({url}) | {lang} | {desc} | ⭐{stars} |")
+            lines.append(f"| [{md_escape(author)}/{md_escape(name)}]({url}) | {lang} | {md_escape(desc)} | ⭐{stars} |")
         lines.append("")
 
     # 按 group 顺序输出 RSS 区块
@@ -660,7 +667,7 @@ def generate_daily_md(
                 summary_zh = summary_zh[:25] + "…"
             url = item["url"]
             source = item.get("source_name", "")
-            lines.append(f"| [{title_zh}]({url}) | {source} | {summary_zh} |")
+            lines.append(f"| [{md_escape(title_zh)}]({url}) | {source} | {md_escape(summary_zh)} |")
         lines.append("")
 
     # 中文技术热点：B站 & 微博
@@ -676,14 +683,14 @@ def generate_daily_md(
             view_count = item.get("view_count", 0)
             view_str = f"{view_count} 播放" if isinstance(view_count, int) else view_count
             url = item.get("url", "")
-            lines.append(f"| [{title}]({url}) | B站: {author} | {view_str} |")
+            lines.append(f"| [{md_escape(title)}]({url}) | B站: {md_escape(author)} | {view_str} |")
         # 微博热搜
         for item in weibo_items[:5]:
             title = item.get("title", "")
             heat = item.get("heat", 0)
             heat_str = f"{heat} 热度" if isinstance(heat, int) else heat
             url = item.get("url", "")
-            lines.append(f"| [{title}]({url}) | 微博热搜 | {heat_str} |")
+            lines.append(f"| [{md_escape(title)}]({url}) | 微博热搜 | {heat_str} |")
         lines.append("")
 
     # Web 搜索补充
@@ -856,3 +863,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

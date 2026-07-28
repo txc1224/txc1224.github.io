@@ -1,7 +1,7 @@
 <template>
   <section ref="discoverRef" class="home-discover home-motion" :class="{ 'is-visible': isVisible }">
     <div class="discover-stack">
-      <article class="discover-panel discover-panel--map" data-reveal="up">
+      <article class="discover-panel discover-panel--map">
         <div class="panel-heading">
           <p class="panel-kicker">Knowledge Map</p>
           <h2>从内容地图里选一条顺手的路径</h2>
@@ -18,7 +18,7 @@
         </div>
       </article>
 
-      <article class="discover-panel discover-panel--feed" data-reveal="up">
+      <article class="discover-panel discover-panel--feed">
         <div class="panel-heading">
           <p class="panel-kicker">Fresh Feed</p>
           <h2>最近日更</h2>
@@ -35,7 +35,7 @@
         </ol>
       </article>
 
-      <article class="discover-panel discover-panel--featured" data-reveal="up">
+      <article class="discover-panel discover-panel--featured">
         <div class="panel-heading">
           <p class="panel-kicker">Featured Notes</p>
           <h2>精选速查</h2>
@@ -50,7 +50,7 @@
         </div>
       </article>
 
-      <article class="discover-panel discover-panel--more" data-reveal="up">
+      <article class="discover-panel discover-panel--more">
         <div class="panel-heading">
           <p class="panel-kicker">More Than Notes</p>
           <h2>站内其他入口</h2>
@@ -80,6 +80,32 @@ const featureSections = computed(() => homeData.sections.filter((section) => sec
 const discoverRef = ref<HTMLElement | null>(null);
 const isVisible = ref(false);
 let observer: IntersectionObserver | undefined;
+let rafId = 0;
+
+// 滚动时:让「最靠近视口中央的那张」面板淡入,其它淡出(一张进、其余消失)
+function syncActivePanel() {
+  rafId = 0;
+  if (!discoverRef.value) return;
+  const panels = [...discoverRef.value.querySelectorAll<HTMLElement>('.discover-panel')];
+  if (panels.length === 0) return;
+  const center = window.innerHeight / 2;
+  let best: HTMLElement | null = null;
+  let bestDist = Infinity;
+  for (const el of panels) {
+    const r = el.getBoundingClientRect();
+    const d = Math.abs(r.top + r.height / 2 - center);
+    if (d < bestDist) {
+      bestDist = d;
+      best = el;
+    }
+  }
+  for (const el of panels) el.classList.toggle('panel-in', el === best);
+}
+
+function onScroll() {
+  if (rafId) return;
+  rafId = window.requestAnimationFrame(syncActivePanel);
+}
 
 onMounted(() => {
   if (!discoverRef.value || typeof window === 'undefined') return;
@@ -92,9 +118,18 @@ onMounted(() => {
     { threshold: 0.12 },
   );
   observer.observe(discoverRef.value);
+
+  syncActivePanel();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
 });
 
 onBeforeUnmount(() => {
   observer?.disconnect();
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('scroll', onScroll);
+    window.removeEventListener('resize', onScroll);
+    if (rafId) window.cancelAnimationFrame(rafId);
+  }
 });
 </script>

@@ -82,24 +82,19 @@ const isVisible = ref(false);
 let observer: IntersectionObserver | undefined;
 let rafId = 0;
 
-// 滚动时:让「最靠近视口中央的那张」面板淡入,其它淡出(一张进、其余消失)
+// 滚动时:每张面板独立判断「是否进入视口」,进入即淡入、完全滚出才淡出。
+// 交接时新旧两张会短暂同时可见(交叉淡化),不会再出现两张都消失的空白。
 function syncActivePanel() {
   rafId = 0;
   if (!discoverRef.value) return;
   const panels = [...discoverRef.value.querySelectorAll<HTMLElement>('.discover-panel')];
-  if (panels.length === 0) return;
-  const center = window.innerHeight / 2;
-  let best: HTMLElement | null = null;
-  let bestDist = Infinity;
+  const vh = window.innerHeight;
   for (const el of panels) {
     const r = el.getBoundingClientRect();
-    const d = Math.abs(r.top + r.height / 2 - center);
-    if (d < bestDist) {
-      bestDist = d;
-      best = el;
-    }
+    // 进入视口(下缘进入视口下 15% 且上缘未完全滚出视口顶 10%)→ 显示;否则淡出
+    const inView = r.bottom > vh * 0.15 && r.top < vh * 0.9;
+    el.classList.toggle('panel-in', inView);
   }
-  for (const el of panels) el.classList.toggle('panel-in', el === best);
 }
 
 function onScroll() {

@@ -100,12 +100,6 @@ const generatedSidebar = generateSidebar([
   },
   {
     documentRootPath: '/docs',
-    scanStartPath: 'playground',
-    resolvePath: '/playground/',
-    useTitleFromFrontmatter: true,
-  },
-  {
-    documentRootPath: '/docs',
     scanStartPath: 'bookmarks',
     resolvePath: '/bookmarks/',
     useTitleFromFrontmatter: true,
@@ -179,7 +173,7 @@ const config = withMermaid(
           ],
         },
         { text: '全网热榜实时聚合', link: 'https://txc1224.github.io/daily-digest/' },
-        { text: '小游戏', link: '/playground/' },
+        { text: '小游戏', link: 'https://txc1224.github.io/game/', target: '_blank' },
         { text: '每日科技资讯', link: '/daily-tech/' },
         { text: '收藏导航', link: '/bookmarks/' },
       ],

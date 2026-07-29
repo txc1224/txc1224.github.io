@@ -25,7 +25,7 @@ const visible = computed(() => {
   const relativePath = page.value.relativePath;
   if (!relativePath) return false;
   if (!relativePath.endsWith('.md')) return false;
-  if (/^(index|daily-tech\/|bookmarks\/|playground\/|archive\/|tags\/)/.test(relativePath)) return false;
+  if (/^(index|daily-tech\/|bookmarks\/|archive\/|tags\/)/.test(relativePath)) return false;
   return !/\/index\.md$/.test(relativePath);
 });
 

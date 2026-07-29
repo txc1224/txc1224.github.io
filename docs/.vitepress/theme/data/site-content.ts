@@ -65,13 +65,7 @@ const SECTION_META: Record<
     href: '/bookmarks/',
     kind: 'feature',
   },
-  playground: {
-    title: '小游戏',
-    description: '文档站内置的三款轻量交互小游戏。',
-    accent: 'Play',
-    href: '/playground/',
-    kind: 'feature',
-  },
+  // 完整版武侠小游戏合集:见导航栏「小游戏」外链(https://txc1224.github.io/game/)
 };
 
 export interface HomeSection {
@@ -241,7 +235,7 @@ const sectionCountMap = new Map<string, number>();
 for (const entry of articleEntries) {
   if (!entry.slug || !SECTION_META[entry.slug]) continue;
   if (entry.slug === 'daily-tech') continue;
-  if (entry.slug === 'bookmarks' || entry.slug === 'playground') continue;
+  if (entry.slug === 'bookmarks') continue;
   if (isIndexLike(entry.url)) continue;
 
   sectionCountMap.set(entry.slug, (sectionCountMap.get(entry.slug) ?? 0) + 1);

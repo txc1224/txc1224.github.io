@@ -17,7 +17,7 @@
           <p class="home-stage__eyebrow">txc memo deck</p>
           <h2>把备忘录做成一个更可爱、也更好逛的技术站。</h2>
           <p class="home-stage__summary">
-            知识点速查、日更资讯、收藏导航和小游戏都在一个入口里。首页不再只是目录，而是你每天回来都会顺手看一眼的面板。
+            知识点速查、日更资讯和收藏导航都在一个入口里。首页不再只是目录，而是你每天回来都会顺手看一眼的面板。
           </p>
 
           <div class="home-stage__actions">

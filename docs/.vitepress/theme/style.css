@@ -103,6 +103,22 @@
   --txc-nav-shadow: 0 22px 54px rgba(0, 0, 0, 0.22);
 }
 
+/* 页面整体背景用主题色,避免底部出现与上方断层的发白 */
+html,
+body {
+  background: var(--txc-shell);
+}
+body {
+  background:
+    radial-gradient(
+      1200px 500px at 50% -8%,
+      color-mix(in srgb, var(--txc-shell-alt) 60%, transparent),
+      transparent 70%
+    ),
+    var(--txc-shell);
+  background-attachment: fixed;
+}
+
 /**
  * Component: Button
  * -------------------------------------------------------------------------- */
@@ -996,7 +1012,7 @@
   padding-bottom: 12vh;
 }
 
-/* 逐张进入/退出:每张卡片占较大高度,滚动时一张进来、上一张滚出即淡出 */
+/* 逐张进入/退出:每张卡片占较大高度,滚动时一张进来、上一张滚出即淡出(带缩放) */
 .discover-panel {
   position: relative;
   display: grid;
@@ -1012,10 +1028,10 @@
     linear-gradient(180deg, var(--txc-card), var(--txc-shell-alt));
   box-shadow: 0 24px 56px rgba(56, 34, 58, 0.14);
   opacity: 0;
-  transform: translateY(48px) scale(0.985);
+  transform: translateY(56px) scale(0.94);
   transition:
-    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.4s ease;
   will-change: opacity, transform;
 }

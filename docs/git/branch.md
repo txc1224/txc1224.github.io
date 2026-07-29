@@ -79,11 +79,11 @@ git merge --no-ff feature/login
 git merge feature/login
 
 # 出现冲突时，文件中会标记冲突区域：
-# <<<<<<< HEAD
+# &lt;<<<<<< HEAD
 # 当前分支的代码
 # =======
 # 合入分支的代码
-# >>>>>>> feature/login
+# &gt;>>>>>> feature/login
 
 # 手动解决后：
 git add <resolved-file>

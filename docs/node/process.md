@@ -116,11 +116,11 @@ if (cluster.isPrimary) {
   const cpuCount = os.cpus().length;
   console.log(`主进程 ${process.pid}，启动 ${cpuCount} 个 worker`);
 
-  for (let i = 0; i < cpuCount; i++) {
+  for (let i = 0; i &lt; cpuCount; i++) {
     cluster.fork(); // 创建工作进程
   }
 
-  cluster.on('exit', (worker, code) => {
+  cluster.on('exit', (worker, code) =&gt; {
     console.log(`Worker ${worker.process.pid} 退出(${code})，重启中...`);
     cluster.fork(); // 自动重启
   });

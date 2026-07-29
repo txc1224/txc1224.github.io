@@ -145,7 +145,7 @@ await pipeline(createReadStream('output.gz'), createGunzip(), createWriteStream(
 ```
 生产者(Readable) → 消费者(Writable)
 
-当消费者处理速度 < 生产者产出速度时：
+当消费者处理速度 &lt; 生产者产出速度时：
   1. writable.write() 返回 false → 内部缓冲区满
   2. 生产者应暂停发送
   3. 消费者 drain 事件触发 → 缓冲区已排空
@@ -161,7 +161,7 @@ function writeData(data) {
   const canContinue = writable.write(data);
   if (!canContinue) {
     // 缓冲区满，暂停写入，等待 drain
-    writable.once('drain', () => {
+    writable.once('drain', () =&gt; {
       writeData(nextChunk()); // drain 后继续
     });
   }

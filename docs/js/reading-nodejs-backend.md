@@ -76,8 +76,8 @@ order: 92
 
 > 把书单里的概念反向链接到 01-04 模块已有知识点,边读边补。
 
-- 《深入浅出 Node.js》事件循环章节 → [[../../01-js-core/js-event-loop-basics]]、[[../../01-js-core/js-browser-vs-node-loop]]
-- 《深入浅出 Node.js》Buffer/Stream 章节 → [[../../04-node/node-events-stream]]
-- 《Node.js 实战》中间件章节 → [[../../04-node/node-express-middleware]]
-- 《NestJS 实战》DI 与分层章节 → [[../../04-node/nestjs-di]]
+- 《深入浅出 Node.js》事件循环章节 → [调用栈与事件循环基础](/js/advanced#调用栈与事件循环基础)、[浏览器 vs Node 事件循环差异](/js/advanced#浏览器-vs-node-事件循环差异)
+- 《深入浅出 Node.js》Buffer/Stream 章节 → Node 事件与流
+- 《Node.js 实战》中间件章节 → Express 中间件
+- 《NestJS 实战》DI 与分层章节 → NestJS 依赖注入
 <!-- KNOWLEDGE-IMPORT:END -->

@@ -27,14 +27,14 @@ order: 97
 
 ## 阶段时间分配建议
 
-| 阶段 | 文件                      | 建议周期   | 关键产出                               |
-| ---- | ------------------------- | ---------- | -------------------------------------- |
-| 一   | [[01-js-ts-foundation]]   | 4 周       | 手写 Promise / 深拷贝 / 事件循环 demo  |
-| 二   | [[02-nodejs-backend]]     | 3 周       | 一个能跑的 NestJS CRUD                 |
-| 三   | [[03-database]]           | 3 周       | 设计一个博客系统的 schema + 索引       |
-| 四   | [[04-fullstack-meta]]     | 3 周       | Next.js + Prisma + PostgreSQL 完整项目 |
-| 五   | [[05-cs-fundamentals]]    | 2 周(贯穿) | 用自己的话画出 HTTPS 完整握手          |
-| 六   | [[06-engineering-devops]] | 2 周       | 把项目 dockerize + 上 GitHub Actions   |
+| 阶段 | 文件                                                   | 建议周期   | 关键产出                               |
+| ---- | ------------------------------------------------------ | ---------- | -------------------------------------- |
+| 一   | [一、夯实 JS/TS 根基](/js/reading-js-ts-foundation)    | 4 周       | 手写 Promise / 深拷贝 / 事件循环 demo  |
+| 二   | [二、Node.js 后端](/js/reading-nodejs-backend)         | 3 周       | 一个能跑的 NestJS CRUD                 |
+| 三   | [三、数据库与数据建模](/js/reading-database)           | 3 周       | 设计一个博客系统的 schema + 索引       |
+| 四   | [四、全栈元框架 Next/Nuxt](/js/reading-fullstack-meta) | 3 周       | Next.js + Prisma + PostgreSQL 完整项目 |
+| 五   | [五、计算机基础](/js/reading-cs-fundamentals)          | 2 周(贯穿) | 用自己的话画出 HTTPS 完整握手          |
+| 六   | [六、工程化与 DevOps](/js/reading-engineering-devops)  | 2 周       | 把项目 dockerize + 上 GitHub Actions   |
 
 **总周期**: 约 17 周(≈4 个月)。
 

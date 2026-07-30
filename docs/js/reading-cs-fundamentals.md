@@ -34,7 +34,7 @@ order: 95
 - **状态**: unread
 - **为什么读**: 自顶向下从应用层往物理层讲,正好符合 Web 工程师的认知路径——先搞懂天天在用的 HTTP,再往下挖 TCP/IP,不会一上来就被底层劝退。
 - **阅读重点**: 第 1 章(网络概览)和第 2 章(应用层:HTTP、DNS、Socket)精读;第 3 章(传输层:TCP/UDP、可靠传输、拥塞控制)精读,重点理解三次握手、四次挥手、滑动窗口;第 4-5 章(网络层、链路层)泛读建立直觉即可;第 8 章(网络安全:TLS)精读,跟 HTTPS 强相关。
-- **配套笔记**: [[../../03-browser/browser-http-cache]], [[../../03-browser/browser-cors]], [[../../03-browser/browser-xss]], [[../../03-browser/browser-csp-headers]]
+- **配套笔记**: [HTTP 缓存](/js/advanced#http-缓存)、[CORS](/js/advanced#cors)、[XSS](/js/advanced#xss)、[CSP](/js/advanced#csp)
 - **避坑**: 不要陷入 RFC 细节和报文字段的死记硬背,先建立"数据怎么从 A 到 B"的整体直觉,遇到问题再回头查具体字段。这本贯穿全程读,不要挤在某个阶段集中啃。
 - **我的收获**(留白): <读完后写,AI 写不出这段>
 
@@ -48,7 +48,7 @@ order: 95
 - **状态**: unread
 - **为什么读**: 大量图示 + 极简文字,是《自顶向下方法》的最佳热身读物。读完能立刻用上——看 DevTools 的 Network 面板不再是天书。
 - **阅读重点**: 第 1-4 章(报文结构、状态码、HTTP 方法)精读,这是面试和调试的高频区;第 6 章(HTTP 首部)精读,重点 Host / Accept / Cache-Control / Cookie / CORS 相关头;第 7 章(HTTPS 和 TLS)精读;第 8-11 章(认证、追加协议)泛读。
-- **配套笔记**: [[../../03-browser/browser-http-cache]], [[../../03-browser/browser-cors]], [[../../03-browser/browser-csrf]], [[../../03-browser/browser-csp-headers]]
+- **配套笔记**: [HTTP 缓存](/js/advanced#http-缓存)、[CORS](/js/advanced#cors)、[CSRF](/js/advanced#csrf)、[CSP](/js/advanced#csp)
 - **避坑**: 别因为它是"图解"就轻视——它的状态码和首部两张表值得反复翻。但也别指望它讲透 TCP 和 TLS,那是上一本的活。
 - **我的收获**(留白): <读完后写,AI 写不出这段>
 
@@ -62,7 +62,7 @@ order: 95
 - **状态**: unread
 - **为什么读**: 示例语言是 Java,但思想跨语言通用。它把"好代码"从玄学变成可执行的清单——命名、函数长度、注释、错误处理都有明确标准,直接对应你每天的 CR 和重构决策。
 - **阅读重点**: 第 2 章(有意义的命名)和第 3 章(函数)精读,这是最立竿见影的两章;第 4 章(注释)精读,纠正"注释越多越好"的误区;第 7 章(错误处理)精读;第 10-11 章(类、系统)精读 SOLID 的落地方式;第 14 章后的案例章节泛读,看大师怎么一步步重构。
-- **配套笔记**: [[../../01-js-core/clean-code-principles]], [[../../02-engineering/refactor-workflow]]
+- **配套笔记**: 整洁代码原则、重构工作流
 - **避坑**: 不要把"函数不超过 5 行"当教条硬套——理解"单一职责、信息内聚"的本质比字数更重要。读的时候手边放自己的项目,每读完一章就找一个真实函数重构一遍,否则读完就忘。
 - **我的收获**(留白): <读完后写,AI 写不出这段>
 
@@ -79,12 +79,12 @@ order: 95
 
 > 把书单里的概念反向链接到 01-04 模块已有知识点,边读边补。
 
-- 《计算机网络: 自顶向下方法》第 2 章(HTTP)→ [[../../03-browser/browser-http-cache]]
-- 《计算机网络: 自顶向下方法》第 2 章(DNS / Socket)→ [[../../03-browser/browser-cors]]
-- 《计算机网络: 自顶向下方法》第 8 章(TLS / 安全)→ [[../../03-browser/browser-xss]], [[../../03-browser/browser-csp-headers]]
-- 《图解 HTTP》第 3 章(状态码)→ [[../../03-browser/browser-http-cache]]
-- 《图解 HTTP》第 6 章(首部 / CORS)→ [[../../03-browser/browser-cors]], [[../../03-browser/browser-csrf]]
-- 《图解 HTTP》第 7 章(HTTPS)→ [[../../03-browser/browser-csp-headers]]
-- 《代码整洁之道》第 2-3 章(命名 / 函数)→ [[../../01-js-core/clean-code-principles]]
-- 《代码整洁之道》第 10 章(类 / SOLID)→ [[../../02-engineering/refactor-workflow]]
+- 《计算机网络: 自顶向下方法》第 2 章(HTTP)→ [HTTP 缓存](/js/advanced#http-缓存)
+- 《计算机网络: 自顶向下方法》第 2 章(DNS / Socket)→ [CORS](/js/advanced#cors)
+- 《计算机网络: 自顶向下方法》第 8 章(TLS / 安全)→ [XSS](/js/advanced#xss), [CSP](/js/advanced#csp)
+- 《图解 HTTP》第 3 章(状态码)→ [HTTP 缓存](/js/advanced#http-缓存)
+- 《图解 HTTP》第 6 章(首部 / CORS)→ [CORS](/js/advanced#cors), [CSRF](/js/advanced#csrf)
+- 《图解 HTTP》第 7 章(HTTPS)→ [CSP](/js/advanced#csp)
+- 《代码整洁之道》第 2-3 章(命名 / 函数)→ 整洁代码原则
+- 《代码整洁之道》第 10 章(类 / SOLID)→ 重构工作流
 <!-- KNOWLEDGE-IMPORT:END -->

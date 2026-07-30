@@ -5,8 +5,16 @@
     <link>https://txc1224.github.io/daily-tech/</link>
     <description>每天自动聚合 HackerNews、GitHub Trending 与开发者社区内容。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Tue, 28 Jul 2026 10:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 29 Jul 2026 10:00:00 GMT</lastBuildDate>
     
+    <item>
+      <title>每日科技资讯 2026-07-29</title>
+      <link>https://txc1224.github.io/daily-tech/2026-07-29</link>
+      <guid>https://txc1224.github.io/daily-tech/2026-07-29</guid>
+      <pubDate>Wed, 29 Jul 2026 10:00:00 GMT</pubDate>
+      <description><![CDATA[<p>AI 动态 / 前端技术 / 今日 GitHub Trending / AI 研究动态（arXiv）</p><p>公司团队出行AI助手TeamOut正式上线</p><p>Show HN: Rowboat – 开源本地化的Claude Desktop替代品</p><p>问答：您最喜欢使用的前端工具是什么？</p><p>MoonshotAI/MoonshotAI/Kimi-K3</p><p>slvDev/slvDev/esp32-ai</p>]]></description>
+    </item>
+
     <item>
       <title>每日科技资讯 2026-07-28</title>
       <link>https://txc1224.github.io/daily-tech/2026-07-28</link>
@@ -237,14 +245,6 @@
       <guid>https://txc1224.github.io/daily-tech/2026-06-29</guid>
       <pubDate>Mon, 29 Jun 2026 10:00:00 GMT</pubDate>
       <description><![CDATA[<p>今日 GitHub Trending / AI 研究动态（arXiv） / 开发者社区（Dev.to &amp; Lobste.rs） / 科技深度（MIT TR &amp; Ars Technica）</p><p>deepseek-ai/deepseek-ai/DeepSpec</p><p>bozhouDev/bozhouDev/codex-orange-book</p><p>Yu9191/Yu9191/wloc</p><p>Krishnagangwal/Krishnagangwal/CS-Fundamentals</p><p>winsznx/winsznx/theeleven</p>]]></description>
-    </item>
-
-    <item>
-      <title>每日科技资讯 2026-06-28</title>
-      <link>https://txc1224.github.io/daily-tech/2026-06-28</link>
-      <guid>https://txc1224.github.io/daily-tech/2026-06-28</guid>
-      <pubDate>Sun, 28 Jun 2026 10:00:00 GMT</pubDate>
-      <description><![CDATA[<p>今日 GitHub Trending / 开发者社区（Dev.to &amp; Lobste.rs） / 科技深度（MIT TR &amp; Ars Technica） / 社区热议（Reddit）</p><p>bozhouDev/bozhouDev/codex-orange-book</p><p>deepseek-ai/deepseek-ai/DeepSpec</p><p>bikini/bikini/exploitarium</p><p>Yu9191/Yu9191/wloc</p><p>winsznx/winsznx/theeleven</p>]]></description>
     </item>
   </channel>
 </rss>

@@ -31,7 +31,7 @@ order: 94
 - **状态**: unread
 - **为什么读**: 少有的"以一个完整项目贯穿"的中文全栈书，把 TS、React、Next.js、鉴权、部署串成一条线——正好把前面三个阶段的散点知识缝合成成品。
 - **阅读重点**: SSR/SSG 数据获取（getServerSideProps/getStaticProps）、API 路由、Auth（Session/JWT）、数据库与部署章节精读并跟着做；已熟练的 TS/React 基础章节可快速跳过。
-- **配套笔记**: [[../../03-frontend/react-ssr]]、[[../../02-node-backend/auth-jwt]]
+- **配套笔记**: React SSR、Node 端 JWT 鉴权
 - **避坑**: 跟着书做项目时不要复制粘贴跑通就翻页——每章做完合上书自己重默一遍数据流（请求 → 渲染 → hydration），否则学完还是"看得懂写不出"。
 - **我的收获**(留白): <读完后写，AI 写不出这段>
 
@@ -45,7 +45,7 @@ order: 94
 - **状态**: unread
 - **为什么读**: 第一本偏"用"，这本偏"懂"——讲清 Next.js 的渲染流水线、缓存分层（Request Memoization / Data Cache / Full Route Cache）和 RSC 的设计动机，是应对版本快速迭代、不被 API 变化甩下的关键。
 - **阅读重点**: 路由与数据获取、渲染策略对比、缓存机制、中间件、性能优化精读；部署平台特定（Vercel 商业功能）章节泛读。
-- **配套笔记**: [[../../03-frontend/nextjs-rendering]]、[[../../03-frontend/nextjs-cache]]、[[../../03-frontend/hydration]]
+- **配套笔记**: Next.js 渲染策略、Next.js 缓存机制、Hydration(注水)
 - **避坑**: 别混淆 SSR / SSG / ISR / CSR 的渲染边界——每学一种策略，强制自己回答三个问题：HTML 在哪生成？数据何时拉取？缓存怎么失效？答不上就回去重读。
 - **我的收获**(留白): <读完后写，AI 写不出这段>
 
@@ -59,11 +59,11 @@ order: 94
 
 > 把书单里的概念反向链接到 01-04 模块已有知识点，边读边补。
 
-- 《全栈开发一本通》数据获取章节 → [[../../03-frontend/react-ssr]]
-- 《全栈开发一本通》Auth 章节 → [[../../02-node-backend/auth-jwt]]
-- 《Next.js 设计与实现》渲染策略章节 → [[../../03-frontend/nextjs-rendering]]
-- 《Next.js 设计与实现》缓存章节 → [[../../03-frontend/nextjs-cache]]
-- hydration 相关章节 → [[../../03-frontend/hydration]]
+- 《全栈开发一本通》数据获取章节 → React SSR
+- 《全栈开发一本通》Auth 章节 → Node 端 JWT 鉴权
+- 《Next.js 设计与实现》渲染策略章节 → Next.js 渲染策略
+- 《Next.js 设计与实现》缓存章节 → Next.js 缓存机制
+- hydration 相关章节 → Hydration(注水)
 
 > 通用避坑：不要一上来就用 App Router 所有新特性（Server Actions、RSC、Streaming）——先用 Pages Router 跑通完整数据流，理解经典 SSR/SSG 后再迁移到 App Router，才知道新特性到底解决了什么问题。
 

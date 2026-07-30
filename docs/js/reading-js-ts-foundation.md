@@ -77,9 +77,9 @@ order: 91
 
 > 把书单里的概念反向链接到 01-04 模块已有知识点,边读边补。
 
-- 《你不知道的 JavaScript》上卷第 1-2 章 → [[../../01-js-core/js-scope-chain]]
-- 《你不知道的 JavaScript》上卷第 3-5 章 → [[../../01-js-core/js-closure]]
-- 《你不知道的 JavaScript》中卷异步部分 → [[../../01-js-core/js-event-loop-basics]]、[[../../01-js-core/js-promise]]
-- 《TypeScript 编程》泛型章节 → [[../../02-ts/ts-generics]]
-- 《Vue.js 设计与实现》响应式章节 → [[../../03-framework/vue-reactivity]]
+- 《你不知道的 JavaScript》上卷第 1-2 章 → [作用域与作用域链](/js/core#变量与作用域)
+- 《你不知道的 JavaScript》上卷第 3-5 章 → [闭包](/js/core#闭包)
+- 《你不知道的 JavaScript》中卷异步部分 → [事件循环基础](/js/advanced#调用栈与事件循环基础)、[Promise 核心 API](/js/async#promise-核心-api)
+- 《TypeScript 编程》泛型章节 → TypeScript 泛型
+- 《Vue.js 设计与实现》响应式章节 → [Vue 响应式系统](/vue/reactivity)
 <!-- KNOWLEDGE-IMPORT:END -->

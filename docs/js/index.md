@@ -17,3 +17,13 @@ order: 1
 - [Map & Set / Generator / Proxy / Symbol](./advanced)
 - [正则表达式](./regex)
 - [设计模式 / 错误处理](./patterns)
+
+## 学习书单
+
+- [学习书单 · 一、JS/TS 根基](./reading-js-ts-foundation)
+- [学习书单 · 二、Node.js 后端](./reading-nodejs-backend)
+- [学习书单 · 三、数据库与数据建模](./reading-database)
+- [学习书单 · 四、全栈元框架 Next/Nuxt](./reading-fullstack-meta)
+- [学习书单 · 五、计算机基础](./reading-cs-fundamentals)
+- [学习书单 · 六、工程化与 DevOps](./reading-engineering-devops)
+- [学习书单 · 七、学习顺序与实操建议](./reading-learning-roadmap)

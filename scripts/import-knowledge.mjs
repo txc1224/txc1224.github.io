@@ -80,6 +80,15 @@ const MAPPING = {
   '前端知识库/04-frameworks/02-react': 'react/hooks.md',
   '前端知识库/04-frameworks/03-miniprogram': 'js/advanced.md',
 
+  // ─── 全栈路线 ──────
+  '全栈路线/01-js-ts-foundation': 'js/reading-js-ts-foundation.md',
+  '全栈路线/02-nodejs-backend': 'js/reading-nodejs-backend.md',
+  '全栈路线/03-database': 'js/reading-database.md',
+  '全栈路线/04-fullstack-meta': 'js/reading-fullstack-meta.md',
+  '全栈路线/05-cs-fundamentals': 'js/reading-cs-fundamentals.md',
+  '全栈路线/06-engineering-devops': 'js/reading-engineering-devops.md',
+  '全栈路线/07-learning-roadmap': 'js/reading-learning-roadmap.md',
+
   // ─── Java 知识库 ──────
   'Java知识库/01-basics': 'java/types.md',
   'Java知识库/02-jvm': 'java/types.md',
@@ -115,7 +124,9 @@ function readTarget(relPath) {
   if (existsSync(idx)) {
     const idxSrc = readFileSync(idx, 'utf-8');
     const idxFM = parseFM(idxSrc);
-    const title = idxFM.title || basenameNoExt(relPath);
+    let title = idxFM.title || basenameNoExt(relPath);
+    // 剥掉外层单/双引号,防止生成 title: ''xxx''
+    title = String(title).replace(/^['"]|['"]$/g, '');
     return `---\ntitle: '${title}'\norder: 99\n---\n\n# ${title}\n\n`;
   }
   return '';
@@ -141,6 +152,7 @@ function main() {
     ...readKB(join(KB_ROOT, '前端知识库')),
     ...readKB(join(KB_ROOT, 'Java知识库')),
     ...readKB(join(KB_ROOT, 'Python知识库')),
+    ...readKB(join(KB_ROOT, '全栈路线')),
   ];
 
   // 按目标文件分组

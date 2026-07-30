@@ -1,6 +1,6 @@
 ---
 title: '学习书单 · 六、工程化与 DevOps'
-order: 99
+order: 96
 ---
 
 # 学习书单 · 六、工程化与 DevOps

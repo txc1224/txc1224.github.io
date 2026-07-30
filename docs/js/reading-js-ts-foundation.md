@@ -1,6 +1,6 @@
 ---
 title: '学习书单 · 一、JS/TS 根基'
-order: 99
+order: 91
 ---
 
 # 学习书单 · 一、JS/TS 根基

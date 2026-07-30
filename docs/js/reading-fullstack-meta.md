@@ -1,6 +1,6 @@
 ---
 title: '学习书单 · 四、全栈元框架 Next/Nuxt'
-order: 99
+order: 94
 ---
 
 # 学习书单 · 四、全栈元框架 Next/Nuxt

@@ -100,6 +100,13 @@ const generatedSidebar = generateSidebar([
   },
   {
     documentRootPath: '/docs',
+    scanStartPath: 'ai',
+    resolvePath: '/ai/',
+    useTitleFromFrontmatter: true,
+    sortMenusByFrontmatterOrder: true,
+  },
+  {
+    documentRootPath: '/docs',
     scanStartPath: 'bookmarks',
     resolvePath: '/bookmarks/',
     useTitleFromFrontmatter: true,
@@ -162,6 +169,17 @@ const config = withMermaid(
           items: [
             { text: 'Vue', link: '/vue/' },
             { text: 'React', link: '/react/' },
+          ],
+        },
+        {
+          text: 'AI',
+          items: [
+            { text: '总览', link: '/ai/' },
+            { text: '基础', link: '/ai/prompt-engineering' },
+            { text: '编排与流程', link: '/ai/orchestration' },
+            { text: '工具与协议', link: '/ai/function-calling' },
+            { text: '框架实战', link: '/ai/langchain' },
+            { text: '工程深化', link: '/ai/agent-patterns' },
           ],
         },
         {

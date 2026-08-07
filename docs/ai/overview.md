@@ -62,7 +62,7 @@ flowchart TD
 ## 核心术语速查
 
 | 术语              | 一句话                                                    | 深入                                              |
-| ----------------- | --------------------------------------------------------- | ------------------------------------------------- | ------------------------ |
+| ----------------- | --------------------------------------------------------- | ------------------------------------------------- |
 | Agent             | 模型在循环里自主决定下一步（调工具/继续/终止）的执行单元  | [Agent 模式](./agent-patterns)                    |
 | Workflow          | 控制流由代码预先定义的确定性多步编排                      | [Workflow](./workflow)                            |
 | BPMN              | 带标准图形符号与执行引擎的业务流程建模（含人工任务/审计） | [BPMN](./bpmn)                                    |
@@ -77,7 +77,7 @@ flowchart TD
 | Guardrails        | 输入/工具/输出三层确定性护栏，拦截越界与危险操作          | [Agent 模式](./agent-patterns)                    |
 | Durable Execution | 持久化执行：崩溃后靠事件重放恢复，而非从头重跑            | [Workflow](./workflow)                            |
 | Checkpointer      | LangGraph 的状态持久化机制，支撑断点恢复与时间旅行        | [LangGraph](./langgraph)                          |
-| LCEL              | LangChain 表达式语言，用 `                                | ` 把组件拼成链                                    | [LangChain](./langchain) |
+| LCEL              | LangChain 表达式语言，用竖线 `&#124;` 把组件拼成链        | [LangChain](./langchain)                          |
 | LLM-as-Judge      | 用另一个模型当评委给输出打分（需防偏差）                  | [评估](./evaluation)                              |
 | Prompt Injection  | 通过输入污染诱导模型越权/泄密的攻击                       | [安全](./llm-security)                            |
 
